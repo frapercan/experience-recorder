@@ -1,5 +1,7 @@
 name: Pipy publish
-on: push
+on:
+  push:
+    branches: ["main"]
 
 jobs:
   ci:
