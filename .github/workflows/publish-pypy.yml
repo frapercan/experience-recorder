@@ -1,10 +1,5 @@
-name: Compile sphinx documentation
-
-on:
-  pull_request:
-    branches:
-      - main
-      - dev
+name: Pipy publish
+on: push
 
 jobs:
   ci:
@@ -24,8 +19,9 @@ jobs:
         uses: abatilo/actions-poetry@v2
         with:
           poetry-version: ${{ matrix.poetry-version }}
-      - name: install dependecies
-        run: poetry install
-
-      - name: doc_compile
-        run: poetry run task html_docs
+      - name: install dependecies and build
+        run: | 
+              poetry install 
+              poetry build 
+              poetry config pypi-token.pypi "${{ secrets.PYPI_API_TOKEN }}" 
+              poetry publish
