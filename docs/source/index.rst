@@ -10,4 +10,4 @@ Subsection
 .. toctree::
    :maxdepth: 2
 
-   template.rst
+   experience_recorder.rst

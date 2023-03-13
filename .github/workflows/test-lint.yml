@@ -24,4 +24,4 @@ jobs:
               poetry install
 
       - name: flake8
-        run: poetry run flake8 template
+        run: poetry run flake8 experience_recorder

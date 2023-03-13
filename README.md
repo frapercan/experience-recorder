@@ -1,3 +1,2 @@
-[![codecov](https://codecov.io/gh/frapercan/python-poetry-template/branch/main/graph/badge.svg?token=hqzrADVeRy)](https://codecov.io/gh/frapercan/python-poetry-template)
-
- 
+[![codecov](https://codecov.io/gh/frapercan/experience-recorder/branch/main/graph/badge.svg?token=hIyfvLsU2D)](https://codecov.io/gh/frapercan/experience-recorder)
+[![PyPI version](https://badge.fury.io/py/experience_recorder.svg)](https://badge.fury.io/py/experience_recorder)
