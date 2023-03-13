@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "experience_recorder
+name = "experience_recorder"
 version = "0.1.0"
 description = ""
 authors = ["frapercan <frapercan1@alum.us.es>"]
