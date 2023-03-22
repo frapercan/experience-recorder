@@ -1,0 +1,4 @@
+datasets_dir: ./datasets
+task: 2048
+language: en
+delay_reward: 0
