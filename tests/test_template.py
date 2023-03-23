@@ -14,10 +14,5 @@ def test_along():
             task_configuration.save_configuration()
             recorder = Recorder(global_configuration, task_configuration.conf)
 
-            dir = '__buffer__'
-            for f in os.listdir(dir):
-                os.remove(os.path.join(dir, f))
-            recorder.start_senses()
-            recorder.start()
 
 

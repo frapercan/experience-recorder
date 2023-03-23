@@ -21,7 +21,7 @@ jobs:
           poetry-version: ${{ matrix.poetry-version }}
       - name: install dependecies
         run: | 
-              poetry install
+              poetry install --dev
 
       - name: flake8
         run: poetry run flake8 experience_recorder
