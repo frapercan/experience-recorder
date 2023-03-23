@@ -24,5 +24,5 @@ class Senses():
 
             screenshot = pyautogui.screenshot(region=(left, top, width, height))
             ts = datetime.now().timestamp()
-            screenshot.save(os.path.join("./__buffer__",f"{str(ts)}*{sense}.png"))
+            screenshot.save(os.path.join("./__buffer__",f"{str(ts)}-{sense}.png"))
             # self.state_screenshot = np.array(screenshot)

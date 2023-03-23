@@ -32,7 +32,6 @@ class Skills():
         return text
 
     def search_state(self, sense):
-        state_time = float(datetime.now().timestamp())
         directory = "./__buffer__/"
         files = listdir(directory)
         files.sort(reverse=True)

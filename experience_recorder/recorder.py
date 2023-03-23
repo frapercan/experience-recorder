@@ -2,13 +2,14 @@ import logging
 import os
 import sys
 from datetime import datetime
+
+from pynput import mouse
 from pynput.keyboard import Listener as KeyboardListener
 import yaml
 from pynput.keyboard import Key
 import torch
 from experience_recorder.senses import Senses
 from experience_recorder.skills import Skills
-
 
 fmt = '[%(asctime)-15s] [%(levelname)s] %(name)s: %(message)s'
 logging.basicConfig(format=fmt, level=logging.INFO, stream=sys.stdout)
@@ -40,48 +41,36 @@ class Recorder:
         self.logger.info(f"Global Conf:\n {self.global_conf}")
         self.logger.info(f"Task Conf: \n{self.task_conf}")
 
-
     def start_senses(self):
-
         self.senses = Senses(self.task_conf['senses'])
         for sense in self.task_conf['senses']:
             sense_proccess = torch.multiprocessing.Process(
                 target=getattr(self.senses, self.task_conf['senses'][sense]['kind']), args=[sense])
             sense_proccess.start()
 
-    def create_task(self):
-        configuration = {}
-        self.coordinates_setup(configuration, rewards=self.global_configuration['rewards'])
-
-        with open(f"conf/tasks/{self.global_configuration['task']}.yaml", 'w') as configuration_file:
-            yaml.dump(configuration, configuration_file, default_flow_style=False)
-
-        self.logger.info(f"New Conf file: \n {configuration}")
-
-        return configuration
-
-    def read_task_configuration(self, task):
-        with open(f"conf/tasks/{task}.yaml", 'r', encoding='utf-8') as conf:
-            conf = yaml.safe_load(conf)
-            self.logger.info(f"Task Configuration loaded: {conf}")
-            return conf
-
     def start(self):
         def on_press(key):
             global action
             print("Key pressed: {0}".format(key))
-            action = key
-            self.store_experience()
-
+            self.store_experience(key)
             if key == Key.backspace:
                 self.logger.info("Exiting recorder")
                 return False
 
-        keyboard_listener = KeyboardListener(on_press=on_press)
-        keyboard_listener.start()
-        keyboard_listener.join()
+        def on_click(x, y, button, pressed):
+            if button == mouse.Button.left and pressed:
+                self.store_experience({'button':button,'x':x,'y':y})
+                print('{} at {}'.format('Pressed Left Click' if pressed else 'Released Left Click', (x, y)))
 
-    def store_experience(self):
+        if self.task_conf['mouse']:
+            listener = mouse.Listener(on_click=on_click)
+            listener.start()
+        if self.task_conf['keyboard']:
+            keyboard_listener = KeyboardListener(on_press=on_press)
+            keyboard_listener.start()
+            keyboard_listener.join()
+
+    def store_experience(self,key_info):
         task_dataset_dir = os.path.join(self.global_conf['datasets_dir'],
                                         str(self.global_conf['task']))
         if not os.path.exists(task_dataset_dir):
@@ -93,15 +82,15 @@ class Recorder:
 
         dt = datetime.now().timestamp()
 
-        action_dir = os.path.join(experience_dir, str(dt) + "*action.txt")
+        action_dir = os.path.join(experience_dir, str(dt) + "-action.txt")
 
         with open(action_dir, 'w') as f:
-            f.write(str(action))
+            f.write(str(key_info))
             f.close()
 
         self.skills = Skills(self.task_conf['senses'])
         for sense in self.task_conf['senses']:
-            capture = getattr(self.skills,self.task_conf['senses'][sense]['skill'])(sense)
+            capture = getattr(self.skills, self.task_conf['senses'][sense]['skill'])(sense)
 
             format = ""
 
@@ -111,12 +100,10 @@ class Recorder:
                 case "<class 'str'>":
                     format = ".txt"
 
-            capture_dir = os.path.join(experience_dir, f"{str(dt)}*{sense}{format}")
+            capture_dir = os.path.join(experience_dir, f"{str(dt)}-{sense}{format}")
             if format == ".txt":
                 with open(capture_dir, 'w') as f:
                     f.write(capture)
                     f.close()
             else:
                 capture.save(capture_dir)
-
-

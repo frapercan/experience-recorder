@@ -22,6 +22,12 @@ class Configuration:
 
     def create(self, global_configuration):
         conf = {"task": str(global_configuration["task"]), 'senses': {}}
+
+        keyboard_usage = self.ask_for_keyboard_usage()
+        conf['keyboard'] = keyboard_usage
+        mouse_usage = self.ask_for_mouse_usage()
+        conf['mouse'] = mouse_usage
+
         amount = self.ask_for_sense_amount()
         for i in range(0, amount):
             name, kind, skill, location = self.ask_for_sense(i)
@@ -104,3 +110,11 @@ class Configuration:
             conf = yaml.safe_load(conf)
             self.logger.info(f"Configuration loaded: {conf}")
             return conf
+
+    def ask_for_keyboard_usage(self):
+        keyboard_usage = input(f'Record keyboard? 0 - No, 1 - Yes: \n')
+        return True if keyboard_usage else False
+
+    def ask_for_mouse_usage(self):
+        mouse_usage = input(f'Record mouse? 0 - No, 1 - Yes: \n')
+        return True if mouse_usage else False
