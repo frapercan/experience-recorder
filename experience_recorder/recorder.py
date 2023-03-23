@@ -5,7 +5,6 @@ from datetime import datetime
 
 from pynput import mouse
 from pynput.keyboard import Listener as KeyboardListener
-import yaml
 from pynput.keyboard import Key
 import torch
 from experience_recorder.senses import Senses
@@ -59,7 +58,7 @@ class Recorder:
 
         def on_click(x, y, button, pressed):
             if button == mouse.Button.left and pressed:
-                self.store_experience({'button':button,'x':x,'y':y})
+                self.store_experience({'button': button, 'x': x, 'y': y})
                 print('{} at {}'.format('Pressed Left Click' if pressed else 'Released Left Click', (x, y)))
 
         if self.task_conf['mouse']:
@@ -70,7 +69,7 @@ class Recorder:
             keyboard_listener.start()
             keyboard_listener.join()
 
-    def store_experience(self,key_info):
+    def store_experience(self, key_info):
         task_dataset_dir = os.path.join(self.global_conf['datasets_dir'],
                                         str(self.global_conf['task']))
         if not os.path.exists(task_dataset_dir):

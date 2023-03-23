@@ -35,12 +35,11 @@ class Configuration:
             conf['senses'][name] = sense
         return conf
 
-
     def ask_for_sense_amount(self):
         amount = input('Enter the amount of senses for your model: \n')
         try:
             amount = int(amount)
-        except Exception as e:
+        except Exception:
             self.logger.error('Bad input for amount of senses')
             sys.exit(1)
         return int(amount)
@@ -74,7 +73,12 @@ class Configuration:
     def new_sense(self, kind, skill, location):
         if kind == "see":
             return {'kind': kind, 'skill': skill,
-                    'location': {'left': location[0], 'top': location[1], 'width': location[2]-location[0], 'height': location[3]-location[1]}}
+                    'location':
+                        {'left': location[0],
+                            'top': location[1],
+                            'width': location[2] - location[0],
+                            'height': location[3] - location[1]}
+                    }
 
     def save_configuration(self):
         dir = f"conf/tasks/{self.conf['task']}.yaml"
@@ -112,9 +116,9 @@ class Configuration:
             return conf
 
     def ask_for_keyboard_usage(self):
-        keyboard_usage = input(f'Record keyboard? 0 - No, 1 - Yes: \n')
+        keyboard_usage = input("Record keyboard? 0 - No, 1 - Yes: \n")
         return True if keyboard_usage else False
 
     def ask_for_mouse_usage(self):
-        mouse_usage = input(f'Record mouse? 0 - No, 1 - Yes: \n')
+        mouse_usage = input("Record mouse? 0 - No, 1 - Yes: \n")
         return True if mouse_usage else False
