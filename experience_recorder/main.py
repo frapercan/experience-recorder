@@ -1,8 +1,8 @@
 
 import yaml
 
-from experience_recorder.configuration import Configuration
-from experience_recorder.recorder import Recorder
+from experience_recorder.configuration.configuration import Configuration
+from experience_recorder.recorder.recorder import Recorder
 import os
 
 if __name__ == "__main__":
