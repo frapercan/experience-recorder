@@ -26,7 +26,10 @@ jobs:
               pip3 install pytest
 
       - name: test
-        run: poetry run coverage run -m --source=experience_recorder pytest tests && poetry run coverage report -m
+        run: | 
+          export DISPLAY=:99
+          sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
+          poetry run coverage run -m --source=experience_recorder pytest tests && poetry run coverage report -m
 
 
       - name: Upload coverage reports to Codecov
