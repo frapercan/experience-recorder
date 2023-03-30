@@ -7,21 +7,26 @@ import pyautogui
 
 class Senses():
     """
-    Function squares the input
+    Class that contains the different possibilities of senses in the form of methods.
+    At the moment only sight is contemplated.
 
     Parameters
     ----------
-    num: int, float
-
-    Returns
-    -------
-    int, float
-        Squared argument
+    tasks_configuration:  :class:`dict`
+        Previously loaded .yaml file for tasks configuration.
     """
     def __init__(self, tasks_configuration):
         self.task_conf = tasks_configuration
 
     def see(self, sense):
+        """
+        Screenshot the desired location and buffering it for later consumption through skills.
+
+        Parameters
+        ----------
+        sense:  :class:`str`
+            name of the sense
+        """
         location = self.task_conf[sense]['location']
         while True:
             time.sleep(0.5)
