@@ -34,7 +34,7 @@ class Senses():
             top = location['top']
             width = location['width']
             height = location['height']
-
+            print((left, top, width, height))
             screenshot = pyautogui.screenshot(region=(left, top, width, height))
             ts = datetime.now().timestamp()
             screenshot.save(os.path.join("./__buffer__", f"{str(ts)}-{sense}.png"))

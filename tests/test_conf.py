@@ -21,7 +21,7 @@ def test_create_configuration(inputs):
     def example_function():
         import pyautogui
         while True:
-            pyautogui.click(100, 100)
+            pyautogui.click(400, 100)
 
     new_process = Process(target=example_function)
     new_process.start()
@@ -29,5 +29,6 @@ def test_create_configuration(inputs):
 
     task_configuration = Configuration(global_configuration)
     task_configuration.save_configuration()
+    new_process.kill()
     print(task_configuration)
 
