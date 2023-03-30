@@ -11,6 +11,7 @@ jobs:
         os: [ubuntu-22.04 ]
     runs-on: ${{ matrix.os }}
     steps:
+      - uses: coactions/setup-xvfb@v1
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
@@ -25,10 +26,9 @@ jobs:
               pip3 install coverage
               pip3 install pytest
 
-      - name: Run headless test
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: poetry run coverage run -m --source=experience_recorder pytest tests && poetry run coverage report -m
+      - name: test
+        run: poetry run coverage run -m --source=experience_recorder pytest tests && poetry run coverage report -m
+
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
