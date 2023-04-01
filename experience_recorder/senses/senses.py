@@ -38,3 +38,7 @@ class Senses():
             screenshot = pyautogui.screenshot(region=(left, top, width, height))
             ts = datetime.now().timestamp()
             screenshot.save(os.path.join("./__buffer__", f"{str(ts)}-{sense}.png"))
+
+
+    def ear(self,sense):
+        pass

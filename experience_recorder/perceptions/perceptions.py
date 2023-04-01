@@ -7,7 +7,6 @@ import PIL
 from os import listdir
 import sys
 
-
 fmt = '[%(asctime)-15s] [%(levelname)s] %(name)s: %(message)s'
 logging.basicConfig(format=fmt, level=logging.INFO, stream=sys.stdout)
 
@@ -21,7 +20,8 @@ class Perceptions():
     tasks_configuration:  :class:`dict`
         Previously loaded .yaml file for tasks configuration.
     """
-    def __init__(self,global_configuration, tasks_configuration):
+
+    def __init__(self, global_configuration, tasks_configuration):
         self.global_conf = global_configuration
         self.task_conf = tasks_configuration
         self.logger = logging.getLogger(f'{self.__class__.__name__}')

@@ -74,8 +74,8 @@ class Configuration:
             amount = int(amount)
         except Exception:
             self.logger.error('Bad input for amount of senses')
-            sys.exit(1)
-        return int(amount)
+            amount = self.ask_for_sense_amount()
+        return amount
 
     def ask_for_sense(self, index):
         """
@@ -97,30 +97,9 @@ class Configuration:
         location:  :obj:`List(int,int,int,int)`
             Screen coordinates if sense's kind is see.
         """
-
         name = input(f"Name sense #{index}: \n")
-        kind = input(f'Sense kind #{index} 1 - see, 2 - ear: \n')
-        match kind:
-            case '1':
-                kind = "see"
-                location = self.ask_for_coordinates()
-            case '2':
-                kind = "ear"
-                location = None  # Audio interface maybe
-            case _:
-                self.logger.error('Incorrect sense kind')
-                sys.exit(1)
-
-        skill = input(f'Sense skill #{index} 1 - watch, 2 - read: \n')
-        match skill:
-            case '1':
-                skill = "watch"
-            case '2':
-                skill = "read"
-            case _:
-                self.logger.error('Incorrect sense skill')
-                sys.exit(1)
-
+        kind, location = self.ask_for_sense_kind(index)
+        skill = self.ask_for_skill(index)
         return name, kind, skill, location
 
     def new_sense(self, kind, skill, location):
@@ -148,6 +127,8 @@ class Configuration:
                          'width': location[2] - location[0],
                          'height': location[3] - location[1]}
                     }
+        if kind == "ear":
+            return {'kind': kind, 'skill': skill}
 
     def save_configuration(self):
         """
@@ -219,10 +200,11 @@ class Configuration:
         self.logger.info("kb")
         keyboard_usage = input("Record keyboard? 0 - No, 1 - Yes: \n")
         try:
-            return True if int(keyboard_usage) else False
+            keyboard_usage = int(keyboard_usage)
         except Exception:
             self.logger.error('Bad input for keyboard usage')
-            sys.exit(1)
+            keyboard_usage = self.ask_for_keyboard_usage()
+        return True if keyboard_usage else False
 
     def ask_for_mouse_usage(self):
         """
@@ -235,7 +217,36 @@ class Configuration:
         self.logger.info("mouse")
         mouse_usage = input("Record mouse? 0 - No, 1 - Yes: \n")
         try:
-            return True if int(mouse_usage) else False
+            mouse_usage = int(mouse_usage)
         except Exception:
             self.logger.error('Bad input for mouse usage')
-            sys.exit(1)
+            mouse_usage = self.ask_for_mouse_usage()
+        return True if mouse_usage else False
+
+    def ask_for_sense_kind(self, index):
+        kind = input(f'Sense kind #{index} 1 - see, 2 - ear: \n')
+        match kind:
+            case '1':
+                kind = "see"
+                location = self.ask_for_coordinates()
+            case '2':
+                kind = "ear"
+                location = None  # Audio interface maybe
+            case _:
+                self.logger.error('Incorrect sense kind')
+                kind, location = self.ask_for_sense_kind(index)
+        print(kind, location)
+        return kind, location
+
+    def ask_for_skill(self, index):
+        skill = input(f'Sense skill #{index} 1 - watch, 2 - read: \n')
+        match skill:
+            case '1':
+                skill = "watch"
+            case '2':
+                skill = "read"
+            case _:
+                self.logger.error('Incorrect sense skill')
+                skill = self.ask_for_skill(index)
+        print(skill)
+        return skill
