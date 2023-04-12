@@ -142,7 +142,3 @@ class Recorder:
         if os.path.exists(buffer_dir):
             for f in os.listdir(buffer_dir):
                 os.remove(os.path.join(buffer_dir, f))
-
-
-
-
