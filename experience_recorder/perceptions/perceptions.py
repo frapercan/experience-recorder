@@ -26,7 +26,6 @@ class Perceptions():
         self.task_conf = tasks_configuration
         self.logger = logging.getLogger(f'{self.__class__.__name__}')
         self.ocr = PaddleOCR(use_angle_cls=True, lang='en', show_log=False)
-
     def watch(self, sense):
         """
         Search the latest state and returns it without modifications.

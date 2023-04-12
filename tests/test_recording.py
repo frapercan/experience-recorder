@@ -1,19 +1,17 @@
 import os
 import shutil
 import time
-from unittest.mock import patch
-from pynput.keyboard import Key
+from unittest.mock import patch, MagicMock
 from multiprocessing import Process
 from PIL import Image
 
 from experience_recorder.configuration.configuration import Configuration
 from experience_recorder.recorder.recorder import Recorder
-from experience_recorder.senses.senses import Senses
 from tests.hci_interaction_processes import click_proccess, keypress_proccess
 from tests.test_configuration import load_configuration
 
 
-@patch('paddleocr.PaddleOCR')
+@patch('paddleocr.PaddleOCR.__new__')
 @patch('pyautogui.screenshot')
 def test_recorder(screenshot, ocr):
     global_configuration = load_configuration()
@@ -52,3 +50,4 @@ def test_recorder(screenshot, ocr):
     recorder.empty_buffer()
 
 
+test_recorder()
