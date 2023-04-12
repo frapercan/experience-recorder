@@ -15,7 +15,8 @@ class Senses():
     tasks_configuration:  :class:`dict`
         Previously loaded .yaml file for tasks configuration.
     """
-    def __init__(self, tasks_configuration):
+    def __init__(self,global_configuration, tasks_configuration):
+        self.global_conf = global_configuration
         self.task_conf = tasks_configuration
 
     def see(self, sense):
@@ -28,17 +29,16 @@ class Senses():
             name of the sense
         """
         location = self.task_conf[sense]['location']
-        while True:
+        for _ in range(5):
+            print('tpm')
             time.sleep(0.5)
             left = location['left']
             top = location['top']
             width = location['width']
             height = location['height']
-            print((left, top, width, height))
             screenshot = pyautogui.screenshot(region=(left, top, width, height))
             ts = datetime.now().timestamp()
-            screenshot.save(os.path.join("./__buffer__", f"{str(ts)}-{sense}.png"))
-
+            screenshot.save(os.path.join(self.global_conf['buffer_dir'], f"{str(ts)}-{sense}.png"))
 
     def ear(self,sense):
         pass

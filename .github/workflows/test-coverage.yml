@@ -22,9 +22,11 @@ jobs:
       - name: install dependecies
         run: | 
               sudo apt-get install xvfb
+              sudo apt-get install xdotool
               poetry install 
               pip3 install coverage
               pip3 install pytest
+          
 
       - name: Run headless test
         run: xvfb-run --auto-servernum --server-num=1  poetry run coverage run -m --source=experience_recorder pytest tests

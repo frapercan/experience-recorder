@@ -2,11 +2,16 @@ import logging
 import os
 import sys
 from datetime import datetime
+import time
+
+from multiprocessing import active_children
 
 from pynput import mouse
 from pynput.keyboard import Listener as KeyboardListener
 from pynput.keyboard import Key
-import torch
+
+from multiprocessing import Process
+
 from experience_recorder.senses.senses import Senses
 from experience_recorder.perceptions.perceptions import Perceptions
 
@@ -45,11 +50,12 @@ class Recorder:
         """
         A method that starts sensing processes in parallel.
         """
-        self.senses = Senses(self.task_conf['senses'])
+        self.senses = Senses(self.global_conf,self.task_conf['senses'])
         for sense in self.task_conf['senses']:
-            sense_proccess = torch.multiprocessing.Process(
+            sense_proccess = Process(
                 target=getattr(self.senses, self.task_conf['senses'][sense]['kind']), args=[sense])
             sense_proccess.start()
+        time.sleep(3)
 
     def start(self):
         """
@@ -61,6 +67,9 @@ class Recorder:
             print("Key pressed: {0}".format(key))
             self.store_experience(key)
             if key == Key.backspace:
+                active = active_children()
+                for child in active:
+                    child.kill()
                 self.logger.info("Exiting recorder")
                 return False
 
@@ -92,8 +101,9 @@ class Recorder:
         """
         task_dataset_dir = os.path.join(self.global_conf['datasets_dir'],
                                         str(self.global_conf['task']))
+
         if not os.path.exists(task_dataset_dir):
-            os.makedirs('task_dataset_dir')
+            os.makedirs(task_dataset_dir)
 
         experience_dir = os.path.join(task_dataset_dir, str(self.starting_time))
         if not os.path.exists(experience_dir):
@@ -131,3 +141,6 @@ class Recorder:
         buffer_dir = self.global_conf['buffer_dir']
         for f in os.listdir(buffer_dir):
             os.remove(os.path.join(buffer_dir, f))
+
+
+
