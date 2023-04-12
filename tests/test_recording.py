@@ -52,4 +52,3 @@ def test_recorder(screenshot, ocr):
     recorder.empty_buffer()
 
 
-test_recorder()

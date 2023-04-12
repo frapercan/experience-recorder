@@ -28,4 +28,4 @@ def test_sense(screenshot,count):
     senses.ear('test_sense_fake')
 
 
-test_sense()
+
