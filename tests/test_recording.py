@@ -11,7 +11,7 @@ from tests.hci_interaction_processes import click_proccess, keypress_proccess
 from tests.test_configuration import load_configuration
 
 
-@patch('paddleocr.PaddleOCR.__new__')
+@patch('paddleocr.PaddleOCR')
 @patch('pyautogui.screenshot')
 def test_recorder(screenshot, ocr):
     global_configuration = load_configuration()
@@ -29,6 +29,7 @@ def test_recorder(screenshot, ocr):
     recorder = Recorder(global_configuration, task_configuration.conf)
 
     screenshot.return_value = Image.open(r"./tests/mock_data/mock_read.png")
+    ocr.__new__.return_value = None
     ocr.ocr.return_value = [[[[[19.0, 3.0], [70.0, 3.0], [70.0, 27.0], [19.0, 27.0]], ('276', 0.9999577403068542)]]]
 
 
