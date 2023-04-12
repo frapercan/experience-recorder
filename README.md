@@ -3,7 +3,7 @@ the University of Seville.
 
 [![codecov](https://codecov.io/gh/frapercan/experience-recorder/branch/main/graph/badge.svg?token=hIyfvLsU2D)](https://codecov.io/gh/frapercan/experience-recorder)
 [![PyPI version](https://badge.fury.io/py/experience_recorder.svg)](https://badge.fury.io/py/experience_recorder)
-
+[![Documentation Status](https://readthedocs.org/projects/experience-recorder/badge/?version=latest)](https://experience-recorder.readthedocs.io/en/latest/?badge=latest)
 
 
 # Experience Recorder
