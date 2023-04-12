@@ -38,7 +38,7 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 html_title = 'Experience Recorder'
 
-autodoc_mock_imports = ["paddleocr","pynput"]
+autodoc_mock_imports = ["paddleocr","pynput","pyautogui"]
 master_doc = 'index'
 
 html_favicon = 'favicon.ico'
