@@ -50,7 +50,7 @@ class Recorder:
         """
         A method that starts sensing processes in parallel.
         """
-        self.senses = Senses(self.global_conf,self.task_conf['senses'])
+        self.senses = Senses(self.global_conf, self.task_conf['senses'])
         for sense in self.task_conf['senses']:
             sense_proccess = Process(
                 target=getattr(self.senses, self.task_conf['senses'][sense]['kind']), args=[sense])
@@ -139,8 +139,10 @@ class Recorder:
 
     def empty_buffer(self):
         buffer_dir = self.global_conf['buffer_dir']
-        for f in os.listdir(buffer_dir):
-            os.remove(os.path.join(buffer_dir, f))
+        if os.path.exists(buffer_dir):
+            for f in os.listdir(buffer_dir):
+                os.remove(os.path.join(buffer_dir, f))
+
 
 
 

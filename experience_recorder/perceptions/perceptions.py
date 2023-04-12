@@ -58,7 +58,7 @@ class Perceptions():
             The text contained in the latest state image.
         """
         state = self.search_state(sense)
-        print('state',state)
+        print('state', state)
         text = self.ocr.ocr(np.array(state), cls=False)[0][0][1][0]
         print(f"text read: :{text}")  # todo: fix logger
         self.logger.info(f"text read: :{text}")

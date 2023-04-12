@@ -1,3 +1,4 @@
+import itertools
 import os
 import time
 from datetime import datetime
@@ -15,7 +16,8 @@ class Senses():
     tasks_configuration:  :class:`dict`
         Previously loaded .yaml file for tasks configuration.
     """
-    def __init__(self,global_configuration, tasks_configuration):
+
+    def __init__(self, global_configuration, tasks_configuration):
         self.global_conf = global_configuration
         self.task_conf = tasks_configuration
 
@@ -29,8 +31,9 @@ class Senses():
             name of the sense
         """
         location = self.task_conf[sense]['location']
-        for _ in range(5):
-            print('tpm')
+        if not os.path.exists(self.global_conf['buffer_dir']):
+            os.makedirs(self.global_conf['buffer_dir'])
+        for _ in itertools.count():
             time.sleep(0.5)
             left = location['left']
             top = location['top']
@@ -40,5 +43,5 @@ class Senses():
             ts = datetime.now().timestamp()
             screenshot.save(os.path.join(self.global_conf['buffer_dir'], f"{str(ts)}-{sense}.png"))
 
-    def ear(self,sense):
+    def ear(self, sense):
         pass

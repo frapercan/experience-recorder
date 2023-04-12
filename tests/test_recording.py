@@ -19,9 +19,13 @@ def test_recorder(screenshot):
     task_configuration = Configuration(global_configuration)
 
     dataset_dir = os.path.join(global_configuration['datasets_dir'],
-                                        str(global_configuration['task']))
+                               str(global_configuration['task']))
     if os.path.exists(dataset_dir):
-        shutil.rmtree(dataset_dir)
+        shutil.rmtree(dataset_dir,ignore_errors=True)
+
+    buffer_dir = global_configuration['buffer_dir']
+    if os.path.exists(buffer_dir):
+        shutil.rmtree(buffer_dir)
 
     recorder = Recorder(global_configuration, task_configuration.conf)
 
@@ -42,5 +46,6 @@ def test_recorder(screenshot):
 
     time.sleep(5)
 
+    recorder.empty_buffer()
 
-
+test_recorder()
