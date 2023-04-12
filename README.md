@@ -1,7 +1,7 @@
 Project for the Master's Thesis in the University Master's Degree in Logic, Computing and Artificial Intelligence at
 the University of Seville.
 
-[logo of a person using a computer, transparent background](https://huggingface.co/nicky007/stable-diffusion-logo-fine-tuned?text=logo+of+a+person+using+a+computer%2C+transparent+background)
+[logo of a person using a computer, transparent background](https://huggingface.co/nicky007/stable-diffusion-logo-fine-tuned?text=logo+of+a+person+using+a+computer%2C+transparent+background) <br>
 ![Experience Recorder Logo](https://github.com/frapercan/experience-recorder/blob/main/logo.jpeg?raw=true) <br>
 
 [![codecov](https://codecov.io/gh/frapercan/experience-recorder/branch/main/graph/badge.svg?token=hIyfvLsU2D)](https://codecov.io/gh/frapercan/experience-recorder)
