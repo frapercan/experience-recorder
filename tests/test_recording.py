@@ -13,15 +13,16 @@ from tests.hci_interaction_processes import click_proccess, keypress_proccess
 from tests.test_configuration import load_configuration
 
 
+@patch('paddleocr.PaddleOCR.ocr')
 @patch('pyautogui.screenshot')
-def test_recorder(screenshot):
+def test_recorder(screenshot, ocr):
     global_configuration = load_configuration()
     task_configuration = Configuration(global_configuration)
 
     dataset_dir = os.path.join(global_configuration['datasets_dir'],
                                str(global_configuration['task']))
     if os.path.exists(dataset_dir):
-        shutil.rmtree(dataset_dir,ignore_errors=True)
+        shutil.rmtree(dataset_dir, ignore_errors=True)
 
     buffer_dir = global_configuration['buffer_dir']
     if os.path.exists(buffer_dir):
@@ -30,6 +31,8 @@ def test_recorder(screenshot):
     recorder = Recorder(global_configuration, task_configuration.conf)
 
     screenshot.return_value = Image.open(r"./tests/mock_data/mock_read.png")
+    ocr.return_value = [[[[[19.0, 3.0], [70.0, 3.0], [70.0, 27.0], [19.0, 27.0]], ('276', 0.9999577403068542)]]]
+
 
     recorder.empty_buffer()
     recorder.start_senses()
@@ -47,5 +50,6 @@ def test_recorder(screenshot):
     time.sleep(5)
 
     recorder.empty_buffer()
+
 
 test_recorder()
