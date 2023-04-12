@@ -4,10 +4,8 @@ the University of Seville.
 [![codecov](https://codecov.io/gh/frapercan/experience-recorder/branch/main/graph/badge.svg?token=hIyfvLsU2D)](https://codecov.io/gh/frapercan/experience-recorder)
 [![PyPI version](https://badge.fury.io/py/experience_recorder.svg)](https://badge.fury.io/py/experience_recorder)
 
-# Requirements
-* poetry
-* python10
-* sudo apt-get install xdotool
+
+
 # Experience Recorder
 Utility that supports the task of recording Human Computer Interactions. 
 It has been tried to be modeled following human notions but concepts useds are still adopting new forms.
@@ -22,6 +20,19 @@ This module basically includes python programs based on a global configuration t
 
 This project is designed to support the creation of agents using reinforcement learning through an environment based
 exclusively on the interface between ourselves and our computer.
+
+# Software Prerequisites
+
+| Component                | Description                                  |
+|--------------------------|----------------------------------------------|
+| Linux based distribution | Ubuntu 22.04 recommended                     |
+| python3                  | Version 3.10                                 |
+| Poetry                   | Python dependency management and packaging   |
+| PaddlePaddle             | Optical Character Recognition external package |
+| xdotool                  | simulate keyboard input and mouse activity   |
+
+
+
 
 # Global Configuration
 High level parameters related to system and model configuration. 
