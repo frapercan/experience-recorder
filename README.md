@@ -32,8 +32,6 @@ exclusively on the interface between ourselves and our computer.
 | xdotool                  | simulate keyboard input and mouse activity   |
 
 
-
-
 # Global Configuration
 High level parameters related to system and model configuration. 
 ```
