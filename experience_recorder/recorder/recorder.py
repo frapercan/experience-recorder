@@ -2,13 +2,18 @@ import logging
 import os
 import sys
 from datetime import datetime
+import time
+
+from multiprocessing import active_children
 
 from pynput import mouse
 from pynput.keyboard import Listener as KeyboardListener
 from pynput.keyboard import Key
-import torch
-from experience_recorder.senses import Senses
-from experience_recorder.skills import Skills
+
+from multiprocessing import Process
+
+from experience_recorder.senses.senses import Senses
+from experience_recorder.perceptions.perceptions import Perceptions
 
 fmt = '[%(asctime)-15s] [%(levelname)s] %(name)s: %(message)s'
 logging.basicConfig(format=fmt, level=logging.INFO, stream=sys.stdout)
@@ -19,15 +24,16 @@ r_screen = True
 
 
 class Recorder:
-    """Una actividad es definida por una lista de consultas a través de su ID en el fichero
-    de configuración **'actividades.yaml'**.
-    Esta clase ejecutará las consultas y se encargará de hacer las transformaciones pertinentes al
-    grupo completo para su correcta modelización en el estandard SDMX.
-    Args:
-        configuracion (:class:`Diccionario`): Activity config to be taken, it can be nothing and the
-        initializator will start.
-    Attributes:
-        configuracion (:obj:`Diccionario`): Activity config
+    """
+    Allows the procceses  to run according to the configured senses, it also handles the keyboard and mouse
+    listeners in order to generate the experience dataset.
+
+    Parameters
+    ----------
+    global_configuration:  :class:`dict`
+        Previously loaded .yaml file for system configuration
+    task_configuration:  :class:`dict`
+        Previously loaded .yaml file for task configuration.
     """
 
     def __init__(self, global_configuration, task_configuration):
@@ -41,18 +47,29 @@ class Recorder:
         self.logger.info(f"Task Conf: \n{self.task_conf}")
 
     def start_senses(self):
-        self.senses = Senses(self.task_conf['senses'])
+        """
+        A method that starts sensing processes in parallel.
+        """
+        self.senses = Senses(self.global_conf, self.task_conf['senses'])
         for sense in self.task_conf['senses']:
-            sense_proccess = torch.multiprocessing.Process(
+            sense_proccess = Process(
                 target=getattr(self.senses, self.task_conf['senses'][sense]['kind']), args=[sense])
             sense_proccess.start()
+        time.sleep(3)
 
     def start(self):
+        """
+        Method that launches mouse and keyboard listeners, if configured, that calls to the store_experience method.
+        """
+
         def on_press(key):
             global action
             print("Key pressed: {0}".format(key))
             self.store_experience(key)
             if key == Key.backspace:
+                active = active_children()
+                for child in active:
+                    child.kill()
                 self.logger.info("Exiting recorder")
                 return False
 
@@ -70,10 +87,23 @@ class Recorder:
             keyboard_listener.join()
 
     def store_experience(self, key_info):
+        """
+        Used on listeners, it stores the experience after using the skills on the state immediately prior to having
+        pressed the key, or the mouse.
+
+        Files can be written in two formats, '.txt' for OCR processes and '.png' for images depending upon the skills.
+
+        Parameters
+        ----------
+        key_info:  :class:`list`
+            Key pressed, or mouse location depending on the sense that triggered the method.
+
+        """
         task_dataset_dir = os.path.join(self.global_conf['datasets_dir'],
                                         str(self.global_conf['task']))
+
         if not os.path.exists(task_dataset_dir):
-            os.makedirs('task_dataset_dir')
+            os.makedirs(task_dataset_dir)
 
         experience_dir = os.path.join(task_dataset_dir, str(self.starting_time))
         if not os.path.exists(experience_dir):
@@ -87,9 +117,9 @@ class Recorder:
             f.write(str(key_info))
             f.close()
 
-        self.skills = Skills(self.task_conf['senses'])
+        self.perceptions = Perceptions(self.global_conf, self.task_conf['senses'])
         for sense in self.task_conf['senses']:
-            capture = getattr(self.skills, self.task_conf['senses'][sense]['skill'])(sense)
+            capture = getattr(self.perceptions, self.task_conf['senses'][sense]['skill'])(sense)
 
             format = ""
 
@@ -106,3 +136,9 @@ class Recorder:
                     f.close()
             else:
                 capture.save(capture_dir)
+
+    def empty_buffer(self):
+        buffer_dir = self.global_conf['buffer_dir']
+        if os.path.exists(buffer_dir):
+            for f in os.listdir(buffer_dir):
+                os.remove(os.path.join(buffer_dir, f))

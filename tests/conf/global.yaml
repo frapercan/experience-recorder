@@ -1,0 +1,6 @@
+datasets_dir: ./tests/datasets
+buffer_dir: ./tests/__buffer__/
+tasks_configuration_dir: ./tests/conf/tasks
+task: test_task
+language: en
+delay_reward: 0
