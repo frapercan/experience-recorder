@@ -5,7 +5,7 @@ the University of Seville.
 [![PyPI version](https://badge.fury.io/py/experience_recorder.svg)](https://badge.fury.io/py/experience_recorder)
 [![Documentation Status](https://readthedocs.org/projects/experience-recorder/badge/?version=latest)](https://experience-recorder.readthedocs.io/en/latest/?badge=latest)
 
-
+![Experience Recorder Logo](https://github.com/frapercan/experience-recorder/blob/main/logo.jpeg?raw=true)
 # Experience Recorder
 Utility that supports the task of recording Human Computer Interactions. 
 It has been tried to be modeled following human notions but concepts useds are still adopting new forms.
