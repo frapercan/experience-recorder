@@ -29,6 +29,7 @@ def test_recorder(screenshot, ocr):
     recorder = Recorder(global_configuration, task_configuration.conf)
 
     screenshot.return_value = Image.open(r"./tests/mock_data/mock_read.png")
+    ocr.return_value = MagicMock()
     ocr.return_value.ocr.return_value = [[[[[19.0, 3.0], [70.0, 3.0], [70.0, 27.0], [19.0, 27.0]], ('276', 0.9999577403068542)]]]
 
     recorder.empty_buffer()
@@ -47,6 +48,3 @@ def test_recorder(screenshot, ocr):
     time.sleep(5)
 
     recorder.empty_buffer()
-
-
-test_recorder()
