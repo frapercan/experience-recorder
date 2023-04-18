@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import sys
@@ -42,7 +43,7 @@ class Recorder:
 
         self.logger = logging.getLogger(f'{self.__class__.__name__}')
         self.logger.info('Starting recorder...')
-        self.starting_time = datetime.now().timestamp()
+        self.starting_time = str(datetime.now().timestamp()).replace(".","")
         self.logger.info(f"Global Conf:\n {self.global_conf}")
         self.logger.info(f"Task Conf: \n{self.task_conf}")
 
@@ -109,33 +110,25 @@ class Recorder:
         if not os.path.exists(experience_dir):
             os.makedirs(experience_dir)
 
-        dt = datetime.now().timestamp()
+        dt = str(datetime.now().timestamp()).replace(".","")
 
-        action_dir = os.path.join(experience_dir, str(dt) + "-action.txt")
-
-        with open(action_dir, 'w') as f:
-            f.write(str(key_info))
-            f.close()
+        info = {'action': str(key_info)}
 
         self.perceptions = Perceptions(self.global_conf, self.task_conf['senses'])
+
         for sense in self.task_conf['senses']:
             capture = getattr(self.perceptions, self.task_conf['senses'][sense]['skill'])(sense)
 
-            format = ""
-
             match str(type(capture)):
                 case "<class 'PIL.PngImagePlugin.PngImageFile'>":
-                    format = ".png"
-                case "<class 'str'>":
-                    format = ".txt"
+                    format = "png"
+                    capture_dir = os.path.join(experience_dir, f"{dt}.{sense}.{format}")
+                    capture.save(capture_dir)
 
-            capture_dir = os.path.join(experience_dir, f"{str(dt)}-{sense}{format}")
-            if format == ".txt":
-                with open(capture_dir, 'w') as f:
-                    f.write(capture)
-                    f.close()
-            else:
-                capture.save(capture_dir)
+                case "<class 'str'>":
+                    info[sense] = capture
+        with open(os.path.join(experience_dir, f'{dt}.info.json'), 'w') as outfile:
+            json.dump(info, outfile)
 
     def empty_buffer(self):
         buffer_dir = self.global_conf['buffer_dir']

@@ -1,6 +1,5 @@
 datasets_dir: ./datasets
 buffer_dir: ./__buffer__/
 tasks_configuration_dir: ./conf/tasks
-task: 2048
-language: en
-delay_reward: 0
+task: 2048                              # Task identifier
+language: en                            # OCR language selection

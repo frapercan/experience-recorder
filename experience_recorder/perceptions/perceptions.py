@@ -60,7 +60,11 @@ class Perceptions():
         state = self.search_state(sense)
         print('state', state)
         print(self.ocr.ocr(np.array(state), cls=False))
-        text = self.ocr.ocr(np.array(state), cls=False)[0][0][1][0]
+        print(sense)
+        try:
+            text = self.ocr.ocr(np.array(state), cls=False)[0][0][1][0]
+        except:
+            text = 'None'
         print(f"text read: :{text}")  # todo: fix logger
         self.logger.info(f"text read: :{text}")
         return text
