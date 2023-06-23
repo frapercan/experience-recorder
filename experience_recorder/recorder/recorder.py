@@ -3,6 +3,8 @@ import logging
 import os
 import sys
 from datetime import datetime
+import shutil
+
 import time
 
 from multiprocessing import active_children
@@ -13,15 +15,12 @@ from pynput.keyboard import Key
 
 from multiprocessing import Process
 
-from experience_recorder.senses.senses import Senses
+import experience_recorder.computer as computer
+from experience_recorder.human.human import Human
 from experience_recorder.perceptions.perceptions import Perceptions
 
 fmt = '[%(asctime)-15s] [%(levelname)s] %(name)s: %(message)s'
 logging.basicConfig(format=fmt, level=logging.INFO, stream=sys.stdout)
-
-xx, yy, previous_reward = 0, 0, 0
-action = ""
-r_screen = True
 
 
 class Recorder:
@@ -43,95 +42,86 @@ class Recorder:
 
         self.logger = logging.getLogger(f'{self.__class__.__name__}')
         self.logger.info('Starting recorder...')
-        self.starting_time = str(datetime.now().timestamp()).replace(".","")
+        self.starting_time = str(datetime.now().timestamp()).replace(".", "").ljust(18, '0')
         self.logger.info(f"Global Conf:\n {self.global_conf}")
         self.logger.info(f"Task Conf: \n{self.task_conf}")
 
-    def start_senses(self):
+    def start_computer_recording(self):
         """
         A method that starts sensing processes in parallel.
         """
-        self.senses = Senses(self.global_conf, self.task_conf['senses'])
         for sense in self.task_conf['senses']:
-            sense_proccess = Process(
-                target=getattr(self.senses, self.task_conf['senses'][sense]['kind']), args=[sense])
+            print(self.task_conf)
+            sense_object = getattr(computer, self.task_conf['senses'][sense]['kind'])(self.global_conf,
+                                                                                      self.task_conf['senses'], sense,
+                                                                                      self.starting_time)
+            sense_proccess = Process(target=getattr(sense_object, 'start'))
             sense_proccess.start()
-        time.sleep(3)
+
+    def start_human_recording(self):
+        Human(self.global_conf, self.task_conf, self.starting_time).start()
 
     def start(self):
-        """
-        Method that launches mouse and keyboard listeners, if configured, that calls to the store_experience method.
-        """
-
-        def on_press(key):
-            global action
-            print("Key pressed: {0}".format(key))
-            self.store_experience(key)
-            if key == Key.backspace:
-                active = active_children()
-                for child in active:
-                    child.kill()
-                self.logger.info("Exiting recorder")
-                return False
-
-        def on_click(x, y, button, pressed):
-            if button == mouse.Button.left and pressed:
-                self.store_experience({'button': button, 'x': x, 'y': y})
-                print('{} at {}'.format('Pressed Left Click' if pressed else 'Released Left Click', (x, y)))
-
-        if self.task_conf['mouse']:
-            listener = mouse.Listener(on_click=on_click)
-            listener.start()
-        if self.task_conf['keyboard']:
-            keyboard_listener = KeyboardListener(on_press=on_press)
-            keyboard_listener.start()
-            keyboard_listener.join()
-
-    def store_experience(self, key_info):
-        """
-        Used on listeners, it stores the experience after using the skills on the state immediately prior to having
-        pressed the key, or the mouse.
-
-        Files can be written in two formats, '.txt' for OCR processes and '.png' for images depending upon the skills.
-
-        Parameters
-        ----------
-        key_info:  :class:`list`
-            Key pressed, or mouse location depending on the sense that triggered the method.
-
-        """
-        task_dataset_dir = os.path.join(self.global_conf['datasets_dir'],
-                                        str(self.global_conf['task']))
-
-        if not os.path.exists(task_dataset_dir):
-            os.makedirs(task_dataset_dir)
-
-        experience_dir = os.path.join(task_dataset_dir, str(self.starting_time))
-        if not os.path.exists(experience_dir):
-            os.makedirs(experience_dir)
-
-        dt = str(datetime.now().timestamp()).replace(".","")
-
-        info = {'action': str(key_info)}
-
-        self.perceptions = Perceptions(self.global_conf, self.task_conf['senses'])
-
-        for sense in self.task_conf['senses']:
-            capture = getattr(self.perceptions, self.task_conf['senses'][sense]['skill'])(sense)
-
-            match str(type(capture)):
-                case "<class 'PIL.PngImagePlugin.PngImageFile'>":
-                    format = "png"
-                    capture_dir = os.path.join(experience_dir, f"{dt}.{sense}.{format}")
-                    capture.save(capture_dir)
-
-                case "<class 'str'>":
-                    info[sense] = capture
-        with open(os.path.join(experience_dir, f'{dt}.info.json'), 'w') as outfile:
-            json.dump(info, outfile)
+        self.start_computer_recording()
+        self.start_human_recording()
 
     def empty_buffer(self):
-        buffer_dir = self.global_conf['buffer_dir']
-        if os.path.exists(buffer_dir):
-            for f in os.listdir(buffer_dir):
-                os.remove(os.path.join(buffer_dir, f))
+        raw_datasets_dir = self.global_conf['raw_datasets_dir']
+        if os.path.exists(raw_datasets_dir):
+            for f in os.listdir(raw_datasets_dir):
+                os.remove(os.path.join(raw_datasets_dir, f))
+
+    def percept_on_actions(self):
+        self.perceptions = Perceptions(self.global_conf, self.task_conf['senses'], self.starting_time)
+        datasets_dir = os.path.join(self.global_conf['datasets_dir'], str(self.global_conf['task']), self.starting_time)
+
+        os.makedirs(datasets_dir, exist_ok=True)
+
+        for sense in self.task_conf['senses']:
+            states_dir = os.path.join(self.global_conf['raw_datasets_dir'], self.task_conf['task'], self.starting_time,
+                                      sense)
+            actions_dir = os.path.join(self.global_conf['raw_datasets_dir'], self.task_conf['task'], self.starting_time,
+                                       'actions')
+
+            for action in os.listdir(actions_dir):
+                action_file = open(os.path.join(actions_dir, action), "r")
+                action_dict = json.load(action_file)
+                data_info_file = open(os.path.join(datasets_dir, f"{action_dict['ts']}.json"), "w")
+
+                if self.task_conf['senses'][sense]['perception'] != 'None':
+                    perception = getattr(self.perceptions, self.task_conf['senses'][sense]['perception'])(sense,
+                                                                                                          action_dict[
+                                                                                                              'ts'])
+                    action_dict = action_dict | {sense: perception}
+                    json.dump(action_dict, data_info_file)
+
+    def post_process(self):
+        self.percept_on_actions()
+        self.map_states_to_actions()
+
+    def map_states_to_actions(self):
+        actions_dir = os.path.join(self.global_conf['raw_datasets_dir'], self.task_conf['task'], self.starting_time,
+                                   'actions')
+        actions = os.listdir(actions_dir)
+        datasets_dir = os.path.join(self.global_conf['datasets_dir'], str(self.global_conf['task']), self.starting_time)
+        for sense in self.task_conf['senses']:
+            states_dir = os.path.join(self.global_conf['raw_datasets_dir'], self.task_conf['task'], self.starting_time,
+                                      sense)
+            states_ts = [state for state in os.listdir(states_dir)]
+            if self.task_conf['senses'][sense]['perception'] == 'None':
+                for action in actions:
+                    action_ts = action
+                    states_ts_aux = states_ts
+                    states_ts_aux.append(action_ts)
+                    states_ts_aux.sort()
+                    position = states_ts_aux.index(action_ts)
+                    file_extension = '.' + states_ts[0].split('.')[1]
+                    state_dir = os.path.join(states_dir, states_ts[position - 1])
+                    shutil.copy(state_dir, datasets_dir)
+                    os.rename(os.path.join(datasets_dir, states_ts[position - 1]),
+                              os.path.join(datasets_dir, action_ts.split('.')[0] + file_extension))
+
+
+
+
+

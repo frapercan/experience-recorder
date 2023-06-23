@@ -21,10 +21,11 @@ class Perceptions():
         Previously loaded .yaml file for tasks configuration.
     """
 
-    def __init__(self, global_configuration, tasks_configuration):
+    def __init__(self, global_configuration, tasks_configuration, recording_starting_time):
         self.global_conf = global_configuration
         self.task_conf = tasks_configuration
         self.logger = logging.getLogger(f'{self.__class__.__name__}')
+        self.recording_starting_time = recording_starting_time
         self.ocr = PaddleOCR(use_angle_cls=True, lang='en', show_log=False)
 
     def watch(self, sense):
@@ -43,7 +44,7 @@ class Perceptions():
         """
         return self.search_state(sense)
 
-    def read(self, sense):
+    def read(self, sense, timestamp):
         """
         Search the latest state and returns the text after aplying OCR.
 
@@ -57,7 +58,7 @@ class Perceptions():
         text:  :class:`PIL.Iamage`
             The text contained in the latest state image.
         """
-        state = self.search_state(sense)
+        state = self.search_display_state(sense, timestamp)
         print('state', state)
         print(self.ocr.ocr(np.array(state), cls=False))
         print(sense)
@@ -65,11 +66,10 @@ class Perceptions():
             text = self.ocr.ocr(np.array(state), cls=False)[0][0][1][0]
         except:
             text = 'None'
-        print(f"text read: :{text}")  # todo: fix logger
         self.logger.info(f"text read: :{text}")
         return text
 
-    def search_state(self, sense):
+    def search_display_state(self, sense, timestamp):
         """
         Search the latest state in the buffer and opens it as an image.
         This could be improved through a more formal buffer using indexes.
@@ -79,9 +79,12 @@ class Perceptions():
         sense:  :class:`str`
             name of the sense
         """
-        directory = self.global_conf['buffer_dir']
-        files = listdir(directory)
-        files.sort(reverse=True)
-        files = [file for file in files if sense in file]
-        filename = files[1]
-        return PIL.Image.open(os.path.join(directory, filename))
+        states_dir = os.path.join(self.global_conf['raw_datasets_dir'], str(self.global_conf['task']),
+                                  self.recording_starting_time,
+                                  sense)
+        files = listdir(states_dir)
+        files.append(timestamp)
+        files.sort()
+        index = files.index(timestamp)
+        filename = files[index - 1]
+        return PIL.Image.open(os.path.join(states_dir, filename))

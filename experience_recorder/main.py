@@ -11,7 +11,5 @@ if __name__ == "__main__":
         task_configuration = Configuration(global_configuration)
         task_configuration.save_configuration()
         recorder = Recorder(global_configuration, task_configuration.conf)
-        recorder.empty_buffer()
-
-        recorder.start_senses()
         recorder.start()
+        recorder.post_process()

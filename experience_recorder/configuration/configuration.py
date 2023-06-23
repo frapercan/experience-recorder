@@ -16,10 +16,9 @@ class Configuration:
     """
     Utility class to manage the configuration of the Experience Recorder, allowing the creation and loading of
     configuration files. In this class the following is configured:
-        #. Number of senses to use
-        #. Name of the senses
-        #. Type of senses
-        #. Ability of the senses
+        #. Human actions to be tracked through Mouse and/or Keyboard
+        #. Computer output interfaces to be recorded multiple/single display or Audio simulating what a human senses via the computer
+        #. Deacopled post-procesing operations simulating perception, for example OCR Recognition or Object Detection.
 
     Parameters
     ----------
@@ -53,14 +52,14 @@ class Configuration:
         mouse_usage = self.ask_for_mouse_usage()
         conf['mouse'] = mouse_usage
 
-        amount = self.ask_for_sense_amount()
+        amount = self.ask_for_computer_output_interfaces_amount()
         for i in range(0, amount):
-            name, kind, skill, location = self.ask_for_sense(i)
-            sense = self.new_sense(kind, skill, location)
+            name, kind, perception, args = self.ask_sense_configuration(i)
+            sense = self.new_sense(kind, perception, args)
             conf['senses'][name] = sense
         return conf
 
-    def ask_for_sense_amount(self):
+    def ask_for_computer_output_interfaces_amount(self):
         """
         ask for amount of senses for task configuration
 
@@ -77,7 +76,7 @@ class Configuration:
             amount = self.ask_for_sense_amount()
         return amount
 
-    def ask_for_sense(self, index):
+    def ask_sense_configuration(self, index):
         """
         ask for name, kind, skill and screen coordinates for the current sense.
 
@@ -98,37 +97,30 @@ class Configuration:
             Screen coordinates if sense's kind is see.
         """
         name = input(f"Name sense #{index}: \n")
-        kind, location = self.ask_for_sense_kind(index)
-        skill = self.ask_for_skill(index)
-        return name, kind, skill, location
+        kind, perception, args = self.ask_for_computer_output_interfaces_configuration(index)
+        return name, kind, perception, args
 
-    def new_sense(self, kind, skill, location):
+    def new_sense(self, kind, perception, params):
         """
         structure sense information into dict format.
 
         Parameters
         -------
-        kind:  :class:`int`
+        sense:  :class:`int`
             type of sense.
-        skill:  :class:`int`
+        postprocess:  :class:`int`
             skill/processment configuration after perceiving the state.
-        location:  :obj:`List(int,int,int,int)`
-            Screen coordinates if sense's kind is see.
+        params:  :obj:`Dict`
+            Extra parameters for sense configuration.
         Returns
         -------
         sense:  :class:`dict`
             a dict containing all sense's properties.
         """
-        if kind == "see":
-            return {'kind': kind, 'skill': skill,
-                    'location':
-                        {'left': location[0],
-                         'top': location[1],
-                         'width': location[2] - location[0],
-                         'height': location[3] - location[1]}
-                    }
-        if kind == "ear":
-            return {'kind': kind, 'skill': skill}
+        if not params:
+            return {'kind': kind, 'perception': perception} | {}
+        else:
+            return {'kind': kind, 'perception': perception} | params
 
     def save_configuration(self):
         """
@@ -168,7 +160,7 @@ class Configuration:
 
         self.logger.info(f"Sceene coordinates on screen are: {x1, y1}, {x2, y2} ")
 
-        return x1, y1, x2, y2
+        return {'location': [x1, y1, x2-x1, y2-y1]}
 
     def load_configuration(self, dir):
         """
@@ -223,30 +215,47 @@ class Configuration:
             mouse_usage = self.ask_for_mouse_usage()
         return True if mouse_usage else False
 
-    def ask_for_sense_kind(self, index):
-        kind = input(f'Sense kind #{index} 1 - see, 2 - ear: \n')
+    def ask_for_computer_output_interfaces_configuration(self, index):
+        kind = input(f'Choose type #{index}\n 0 - Display Monitor, 1 - SoundCard: \n')
+
         match kind:
+            case '0':
+                kind = "display"
+                args = self.ask_for_coordinates()
+                perception = self.ask_for_display_perception()
+
             case '1':
-                kind = "see"
-                location = self.ask_for_coordinates()
-            case '2':
-                kind = "ear"
-                location = None  # Audio interface maybe
+                kind = "audio"
+                args = None  # Audio interface maybe
+                perception = self.ask_for_audio_perception()
             case _:
                 self.logger.error('Incorrect sense kind')
-                kind, location = self.ask_for_sense_kind(index)
-        print(kind, location)
-        return kind, location
+                kind, perception, args = self.ask_for_computer_output_interfaces_configuration(index)
+        return kind, perception, args
 
-    def ask_for_skill(self, index):
-        skill = input(f'Sense skill #{index} 1 - watch, 2 - read: \n')
-        match skill:
+    def ask_for_display_perception(self):
+        post_process_type = input(f'Display Perception\n 0 - Nothing, 1 - Read, 2- Detect: \n')
+
+        match post_process_type:
+            case '0':
+                post_process = "None"
             case '1':
-                skill = "watch"
+                post_process = "read"
             case '2':
-                skill = "read"
+                post_process = "detect"
             case _:
-                self.logger.error('Incorrect sense skill')
-                skill = self.ask_for_skill(index)
-        print(skill)
-        return skill
+                self.logger.error('Incorrect Perception')
+                post_process = self.ask_for_display_perception()
+        return post_process
+
+    def ask_for_audio_perception(self):
+        post_process_type = input(f'Audio Perception\n 0 - Nothing \n')
+
+        match post_process_type:
+            case '0':
+                post_process = "None"
+
+            case _:
+                self.logger.error('Incorrect Perception')
+                post_process = self.ask_for_audio_perception()
+        return post_process

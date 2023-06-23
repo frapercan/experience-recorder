@@ -25,13 +25,14 @@ exclusively on the interface between ourselves and our computer.
 
 # Software Prerequisites
 
-| Component                | Description                                  |
-|--------------------------|----------------------------------------------|
-| Linux based distribution | Ubuntu 22.04 recommended                     |
-| python3                  | Version 3.10                                 |
-| Poetry                   | Python dependency management and packaging   |
+| Component                | Description                                    |
+|--------------------------|------------------------------------------------|
+| Linux based distribution | Ubuntu 22.04 recommended                       |
+| python3                  | Version 3.10                                   |
+| Poetry                   | Python dependency management and packaging     |
 | PaddlePaddle             | Optical Character Recognition external package |
-| xdotool                  | simulate keyboard input and mouse activity   |
+| xdotool                  | simulate keyboard input and mouse activity     |
+| libportaudio2            | Sound Tracking                                 |
 
 
 # Global Configuration
