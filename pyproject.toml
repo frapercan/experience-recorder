@@ -36,6 +36,7 @@ pytest-catchlog = "^1.2.2"
 [tool.coverage.run]
 omit = ["*/site-packages/*","experience_recorder/main.py"]
 
+
 [tool.coverage.report]
 fail_under = 100
 

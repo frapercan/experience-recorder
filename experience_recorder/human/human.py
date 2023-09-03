@@ -40,7 +40,7 @@ class Human():
 
         def on_press(key):
             global action
-            print("Key pressed: {0}".format(key))
+            self.logger.info(f"Key pressed: {key}")
             self.store_action(key)
             if key == Key.backspace:
                 active = active_children()
@@ -52,7 +52,7 @@ class Human():
         def on_click(x, y, button, pressed):
             if button == mouse.Button.left and pressed:
                 self.store_action({'button': button, 'x': x, 'y': y})
-                print('{} at {}'.format('Pressed Left Click' if pressed else 'Released Left Click', (x, y)))
+                self.logger.info('{} at {}'.format('Pressed Left Click' if pressed else 'Released Left Click', (x, y)))
 
         if self.task_conf['mouse']:
             listener = mouse.Listener(on_click=on_click)

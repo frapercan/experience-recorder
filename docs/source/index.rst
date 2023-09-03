@@ -8,10 +8,12 @@ This project is designed to support the creation of agents using reinforcement l
 Modules
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 8
 
-   configuration.rst
-   recorder.rst
-   senses.rst
-   perceptions.rst
+   computer
+   configuration
+   human
+   perceptions
+   recorder
+
 

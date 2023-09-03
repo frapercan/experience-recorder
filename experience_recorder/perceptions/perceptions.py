@@ -28,22 +28,6 @@ class Perceptions():
         self.recording_starting_time = recording_starting_time
         self.ocr = PaddleOCR(use_angle_cls=True, lang='en', show_log=False)
 
-    def watch(self, sense):
-        """
-        Search the latest state and returns it without modifications.
-
-        Parameters
-        ----------
-        sense:  :class:`str`
-            name of the sense
-
-        Returns
-        -------
-        image:  :class:`PIL.Iamage`
-            The image of the latest state.
-        """
-        return self.search_state(sense)
-
     def read(self, sense, timestamp):
         """
         Search the latest state and returns the text after aplying OCR.
@@ -59,14 +43,15 @@ class Perceptions():
             The text contained in the latest state image.
         """
         state = self.search_display_state(sense, timestamp)
-        print('state', state)
+
         print(self.ocr.ocr(np.array(state), cls=False))
         print(sense)
         try:
             text = self.ocr.ocr(np.array(state), cls=False)[0][0][1][0]
+
         except:
             text = 'None'
-        self.logger.info(f"text read: :{text}")
+        self.logger.info(f'Text tead:{text}')
         return text
 
     def search_display_state(self, sense, timestamp):

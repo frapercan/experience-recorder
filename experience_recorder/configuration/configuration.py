@@ -29,10 +29,8 @@ class Configuration:
     def __init__(self, global_configuration):
         self.global_conf = global_configuration
         self.logger = logging.getLogger(f'{self.__class__.__name__}')
-        self.logger.info("hola")
         self.tasks_configuration_dir = os.path.join(self.global_conf['tasks_configuration_dir'],
                                                     str(global_configuration['task']) + '.yaml')
-
         self.conf = self.load_configuration(self.tasks_configuration_dir) if os.path.isfile(
             self.tasks_configuration_dir) else self.create()
 
@@ -73,7 +71,7 @@ class Configuration:
             amount = int(amount)
         except Exception:
             self.logger.error('Bad input for amount of senses')
-            amount = self.ask_for_sense_amount()
+            amount = self.ask_for_computer_output_interfaces_amount()
         return amount
 
     def ask_sense_configuration(self, index):

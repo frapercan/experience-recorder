@@ -1,7 +1,7 @@
 import json
 import os
 
-datasets_folder = '/home/xaxi/PycharmProjects/experience-recorder/datasets-copy/2048/'
+datasets_folder = '/home/xaxi/PycharmProjects/experience-recorder/datasets/2048-1-08/'
 datasets = [os.path.join(datasets_folder,dataset_dir) for dataset_dir in os.listdir(datasets_folder)]
 
 # print(datasets)
@@ -46,10 +46,18 @@ for dataset in datasets:
 
         rolling_score = calculate_reward(rolling_score)
         json_file['reward'] = rolling_score
+        try:
+            json_file['insta_reward'] = 1 if json_file['score'] != json.load(open(os.path.join(dataset, files[i+1])))['score'] else 0
+        except:
+            json_file['insta_reward'] = -1
 
         with open(os.path.join(dataset, file), "w") as outfile:
             print('jsonfile',json_file)
             json.dump(json_file, outfile)
+
+
+
+
 
 
 
