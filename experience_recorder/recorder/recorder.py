@@ -50,11 +50,6 @@ class Recorder:
         For each sense (like vision, sound), a new process is spawned that will start its recording function.
         """
         for sense in self.task_conf['senses']:
-            print('sense',sense)
-            print('sense',sense)
-            print('sense',sense)
-            print('sense',sense)
-            print('sense',sense)
             # Dynamically get the appropriate class/object from the `computer` module based on the 'kind' of sense
             # then instantiate it with necessary parameters.
             sense_object = getattr(computer, self.task_conf['senses'][sense]['kind'])(self.global_conf,

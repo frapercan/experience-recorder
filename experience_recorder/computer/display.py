@@ -4,6 +4,7 @@ import time
 from datetime import datetime
 
 import pyautogui
+import mss.tools
 
 
 class Display():
@@ -38,9 +39,16 @@ class Display():
 
         os.makedirs(samples_dir, exist_ok=True)
 
-        for _ in itertools.count():
-            time.sleep(self.global_conf['computer_delay'])
+        monitor = {
+            "top": location[1],
+            "left": location[0],
+            "width": location[2],
+            "height": location[3]
+        }
 
-            screenshot = pyautogui.screenshot(region=location)
-            ts = str(datetime.now().timestamp()).replace(".", "").ljust(18,'0')
-            screenshot.save(os.path.join(samples_dir, f"{str(ts)}.png"))
+        with mss.mss() as sct:
+            for _ in itertools.count():
+                time.sleep(self.global_conf['computer_delay'])
+                ts = str(datetime.now().timestamp()).replace(".", "").ljust(18, '0')
+                sct_img = sct.grab(monitor)
+                mss.tools.to_png(sct_img.rgb, sct_img.size, output=os.path.join(samples_dir, f"{str(ts)}.png"))

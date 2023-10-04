@@ -17,6 +17,7 @@ opencv-python = "4.5.5.64"
 numpy = "^1.24.2"
 sounddevice = "^0.4.6"
 webdataset = "^0.2.48"
+mss = "^9.0.1"
 
 
 [tool.poetry.group.dev.dependencies]
