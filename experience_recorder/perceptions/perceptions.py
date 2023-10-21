@@ -44,8 +44,6 @@ class Perceptions():
         """
         state = self.search_display_state(sense, timestamp)
 
-        print(self.ocr.ocr(np.array(state), cls=False))
-        print(sense)
         try:
             text = self.ocr.ocr(np.array(state), cls=False)[0][0][1][0]
 

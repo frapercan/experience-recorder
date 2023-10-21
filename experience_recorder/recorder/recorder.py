@@ -62,7 +62,6 @@ class Recorder:
             self.computer_processes.append(sense_proccess)
             sense_proccess.start()
 
-
     def start_human_recording(self):
         """
         Initiates the recording of human experiences.
@@ -90,7 +89,7 @@ class Recorder:
         raw_datasets_dir = self.global_conf['raw_datasets_dir']
         if os.path.exists(raw_datasets_dir):
             for raw_datasets in os.listdir(raw_datasets_dir):
-                shutil.rmtree(os.path.join(raw_datasets_dir,raw_datasets))
+                shutil.rmtree(os.path.join(raw_datasets_dir, raw_datasets))
 
     def percept_on_actions(self):
         """
@@ -111,7 +110,7 @@ class Recorder:
             actions_dir = os.path.join(self.global_conf['raw_datasets_dir'], self.task_conf['task'], self.starting_time,
                                        'actions')
 
-            for action in os.listdir(actions_dir):
+            for action in sorted(os.listdir(actions_dir)):
                 action_file = open(os.path.join(actions_dir, action), "r")
                 action_dict = json.load(action_file)
                 data_info_file = open(os.path.join(datasets_dir, f"{action_dict['ts']}.json"), "w")
@@ -133,33 +132,39 @@ class Recorder:
         self.percept_on_actions()
         self.map_states_to_actions()
 
-    def map_states_to_actions(self):
+    def map_states_to_actions(self, state_extension='.png', action_extension='.json'):
         """
         Establishes a correlation between system states and user actions.
 
         For each action, the state of the system is determined and associated. This can help in understanding
         the context of the action.
         """
+        datasets_dir = os.path.join(self.global_conf['datasets_dir'], str(self.global_conf['task']), self.starting_time)
+
         actions_dir = os.path.join(self.global_conf['raw_datasets_dir'], self.task_conf['task'], self.starting_time,
                                    'actions')
-        actions = os.listdir(actions_dir)
-        datasets_dir = os.path.join(self.global_conf['datasets_dir'], str(self.global_conf['task']), self.starting_time)
+        actions_ts = sorted([int(action.split('.')[0]) for action in os.listdir(actions_dir)])
 
         for sense in self.task_conf['senses']:
             states_dir = os.path.join(self.global_conf['raw_datasets_dir'], self.task_conf['task'], self.starting_time,
                                       sense)
-            states_ts = [state for state in os.listdir(states_dir)]
+            states_ts = sorted([int(state.split('.')[0]) for state in os.listdir(states_dir)])
 
             # If no perception method is defined, directly map the state to the action.
             if self.task_conf['senses'][sense]['perception'] == 'None':
-                for action in actions:
-                    action_ts = action
-                    states_ts_aux = states_ts
-                    states_ts_aux.append(action_ts)
-                    states_ts_aux.sort()
-                    position = states_ts_aux.index(action_ts)
-                    file_extension = '.' + states_ts[0].split('.')[1]
-                    state_dir = os.path.join(states_dir, states_ts[position - 1])
-                    shutil.copy(state_dir, datasets_dir)
-                    os.rename(os.path.join(datasets_dir, states_ts[position - 1]),
-                              os.path.join(datasets_dir, action_ts.split('.')[0] + file_extension))
+                states_dir = os.path.join(self.global_conf['raw_datasets_dir'], self.task_conf['task'],
+                                          self.starting_time,
+                                          sense)
+                for action_ts in actions_ts:
+                    states_ts_current = states_ts
+                    previous_state_ts = None
+                    for state_ts in states_ts_current:
+                        if action_ts < state_ts:
+                            state_src_path = os.path.join(states_dir, previous_state_ts + state_extension)
+                            action_target_path = os.path.join(datasets_dir, str(action_ts) + state_extension)
+                            shutil.copy(state_src_path, action_target_path)
+                            break
+
+                        else:
+                            previous_state_ts = str(state_ts)
+                            states_ts = states_ts[1:]

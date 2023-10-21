@@ -41,13 +41,14 @@ class Human():
         def on_press(key):
             global action
             self.logger.info(f"Key pressed: {key}")
-            self.store_action(key)
             if key == Key.backspace:
                 active = active_children()
                 for child in active:
                     child.kill()
                 self.logger.info("Exiting recorder")
                 return False
+            self.store_action(key)
+
 
         def on_click(x, y, button, pressed):
             if button == mouse.Button.left and pressed:
